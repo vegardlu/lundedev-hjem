@@ -55,7 +55,8 @@ export default async function Home() {
   let error = null;
 
   try {
-    const res = await fetch("http://localhost:8080/api/hello", {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+    const res = await fetch(`${apiUrl}/api/hello`, {
       headers: {
         // @ts-expect-error - session type extension
         Authorization: `Bearer ${session.idToken}`
