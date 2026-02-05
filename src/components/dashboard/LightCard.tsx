@@ -5,6 +5,7 @@ import { DashboardCard } from './DashboardCard';
 import { LightBulbIcon } from '@heroicons/react/24/solid';
 import { LightBulbIcon as LightBulbOutline } from '@heroicons/react/24/outline';
 import { LightControlModal } from './LightControlModal';
+import { toggleLightAction, updateLightAction } from '@/actions/light-actions';
 
 interface LightCardProps {
     id: string;
@@ -20,8 +21,6 @@ export function LightCard({ id, name, isOn: initialIsOn, brightness: initialBrig
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-
     const handleToggle = async (e?: React.MouseEvent) => {
         e?.stopPropagation();
         setIsLoading(true);
@@ -30,12 +29,11 @@ export function LightCard({ id, name, isOn: initialIsOn, brightness: initialBrig
         setIsOn(newState);
 
         try {
-            await fetch(`${apiUrl}/api/dashboard/lights/${id}/toggle`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            const result = await toggleLightAction(id, token);
+            if (!result.success) {
+                console.error("Action failed", result.error);
+                setIsOn(!newState); // Revert
+            }
         } catch (error) {
             console.error("Failed to toggle light", error);
             setIsOn(!newState); // Revert
@@ -52,14 +50,7 @@ export function LightCard({ id, name, isOn: initialIsOn, brightness: initialBrig
                 body.color = [newColor.r, newColor.g, newColor.b];
             }
 
-            await fetch(`${apiUrl}/api/dashboard/lights/${id}/state`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(body)
-            });
+            await updateLightAction(id, token, body);
             if (!isOn) setIsOn(true);
         } catch (error) {
             console.error("Failed to update light", error);
