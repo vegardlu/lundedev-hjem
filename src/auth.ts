@@ -9,6 +9,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         })
     ],
     callbacks: {
+        async signIn({ user }) {
+            return user.email === "vegard.hillestad@gmail.com";
+        },
         async jwt({ token, account }) {
             if (account) {
                 token.accessToken = account.access_token
