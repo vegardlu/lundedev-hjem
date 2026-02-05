@@ -143,6 +143,8 @@ export default async function Home() {
                   name={light.name}
                   isOn={light.isOn}
                   brightness={light.brightness}
+                  // @ts-expect-error - session type extension
+                  token={session.idToken}
                 />
               ))}
             </div>
