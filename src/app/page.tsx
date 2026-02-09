@@ -1,5 +1,6 @@
 import { auth, signIn, signOut } from "@/auth";
 import { LightCard } from "@/components/dashboard/LightCard";
+import { WeatherCard, WeatherDto } from "@/components/dashboard/WeatherCard";
 
 interface Light {
   id: string;
@@ -61,6 +62,7 @@ export default async function Home() {
 
   // Handle Authenticated State
   let lights: Light[] = [];
+  let weather: WeatherDto[] = [];
   let error = null;
 
   try {
@@ -68,20 +70,34 @@ export default async function Home() {
     const apiUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://lundedev-core:8080";
     console.log("Fetching dashboard data from:", apiUrl);
 
-    const res = await fetch(`${apiUrl}/api/dashboard/lights`, {
-      headers: {
-        // @ts-expect-error - session type extension
-        Authorization: `Bearer ${session.idToken}`
-      },
-      cache: 'no-store'
-    });
-
-    if (res.ok) {
-      lights = await res.json();
-    } else {
-      console.error(`API Error: ${res.status} ${res.statusText}`);
-      error = "Failed to load dashboard data.";
+    const headers = {
+      // @ts-expect-error - session type extension
+      Authorization: `Bearer ${session.idToken}`
     }
+
+    const [lightsRes, weatherRes] = await Promise.all([
+      fetch(`${apiUrl}/api/dashboard/lights`, { headers, cache: 'no-store' }),
+      fetch(`${apiUrl}/api/dashboard/weather`, { headers, cache: 'no-store' })
+    ])
+
+    if (lightsRes.ok) {
+      lights = await lightsRes.json();
+    } else {
+      console.error(`Lights API Error: ${lightsRes.status} ${lightsRes.statusText}`);
+      error = "Failed to load lights.";
+    }
+
+    if (weatherRes.ok) {
+      weather = await weatherRes.json();
+    } else {
+      console.error(`Weather API Error: ${weatherRes.status} ${weatherRes.statusText}`);
+      // Don't fail the whole dashboard if only weather fails
+    }
+
+    if (!lightsRes.ok && !weatherRes.ok) {
+      error = "Failed to load dashboard data."
+    }
+
   } catch (e) {
     console.error("Failed to fetch dashboard API", e);
     error = "System unavailable.";
@@ -121,7 +137,7 @@ export default async function Home() {
       </header>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
 
         {error && (
           <div className="mb-8 p-4 rounded-xl bg-red-950/30 border border-red-900/50 text-red-200 flex items-center gap-3">
@@ -133,10 +149,25 @@ export default async function Home() {
         )}
 
         <section>
+          <h2 className="text-2xl font-light mb-6 text-zinc-200">Weather</h2>
+          {weather.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {weather.map((w) => (
+                <WeatherCard key={w.location} weather={w} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-zinc-500 italic p-4 text-center border border-dashed border-zinc-800 rounded-xl">
+              Weather data unavailable.
+            </div>
+          )}
+        </section>
+
+        <section>
           <h2 className="text-2xl font-light mb-6 text-zinc-200">Lighting</h2>
           {lights.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {lights.map((light) => (
+              {lights.map((light: Light) => (
                 <LightCard
                   key={light.id}
                   id={light.id}
