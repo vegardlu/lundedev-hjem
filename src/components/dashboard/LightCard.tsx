@@ -91,7 +91,7 @@ export function LightCard({ id, name, isOn: initialIsOn, brightness: initialBrig
                 lightName={name}
                 initialIsOn={isOn}
                 initialBrightness={brightness}
-                onToggle={() => handleToggle()} // Modal toggle
+                onToggle={() => handleToggle()}
                 onUpdate={handleUpdate}
             />
         </>

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 
 export async function toggleLightAction(id: string, token: string) {
     const apiUrl = process.env.INTERNAL_API_URL || "http://lundedev-core:8080";
-    console.log(`[Action] Toggling light ${id} via ${apiUrl}`);
+
 
     try {
         const res = await fetch(`${apiUrl}/api/dashboard/lights/${id}/toggle`, {
@@ -29,7 +29,7 @@ export async function toggleLightAction(id: string, token: string) {
 
 export async function updateLightAction(id: string, token: string, body: any) {
     const apiUrl = process.env.INTERNAL_API_URL || "http://lundedev-core:8080";
-    console.log(`[Action] Updating light ${id} via ${apiUrl}`);
+
 
     try {
         const res = await fetch(`${apiUrl}/api/dashboard/lights/${id}/state`, {
