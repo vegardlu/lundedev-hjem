@@ -21,6 +21,14 @@ export function LightCard({ id, name, isOn: initialIsOn, brightness: initialBrig
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
+    React.useEffect(() => {
+        setIsOn(initialIsOn);
+    }, [initialIsOn]);
+
+    React.useEffect(() => {
+        setBrightness(initialBrightness);
+    }, [initialBrightness]);
+
     const handleToggle = async (e?: React.MouseEvent) => {
         e?.stopPropagation();
         setIsLoading(true);
