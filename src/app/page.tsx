@@ -80,32 +80,38 @@ export default async function Home() {
       fetch(`${apiUrl}/api/dashboard/weather`, { headers, cache: 'no-store' })
     ])
 
+    let shouldRedirect = false;
+
     if (lightsRes.status === 401 || lightsRes.status === 403 || weatherRes.status === 401 || weatherRes.status === 403) {
-      console.log("Session expired or unauthorized. Redirecting to login...");
-      await signIn("google", { redirectTo: "/" });
-    }
-
-    if (lightsRes.ok) {
-      lights = await lightsRes.json();
+      shouldRedirect = true;
     } else {
-      console.error(`Lights API Error: ${lightsRes.status} ${lightsRes.statusText}`);
-      error = "Failed to load lights.";
-    }
+      if (lightsRes.ok) {
+        lights = await lightsRes.json();
+      } else {
+        console.error(`Lights API Error: ${lightsRes.status} ${lightsRes.statusText}`);
+        error = "Failed to load lights.";
+      }
 
-    if (weatherRes.ok) {
-      weather = await weatherRes.json();
-    } else {
-      console.error(`Weather API Error: ${weatherRes.status} ${weatherRes.statusText}`);
-      // Don't fail the whole dashboard if only weather fails
-    }
+      if (weatherRes.ok) {
+        weather = await weatherRes.json();
+      } else {
+        console.error(`Weather API Error: ${weatherRes.status} ${weatherRes.statusText}`);
+        // Don't fail the whole dashboard if only weather fails
+      }
 
-    if (!lightsRes.ok && !weatherRes.ok) {
-      error = "Failed to load dashboard data."
+      if (!lightsRes.ok && !weatherRes.ok) {
+        error = "Failed to load dashboard data."
+      }
     }
 
   } catch (e) {
     console.error("Failed to fetch dashboard API", e);
     error = "System unavailable.";
+  }
+
+  if (shouldRedirect) {
+    console.log("Session expired or unauthorized. Redirecting to login...");
+    await signIn("google", { redirectTo: "/" });
   }
 
   return (
