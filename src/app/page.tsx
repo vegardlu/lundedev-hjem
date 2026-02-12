@@ -64,6 +64,7 @@ export default async function Home() {
   let lights: Light[] = [];
   let weather: WeatherDto[] = [];
   let error = null;
+  let shouldRedirect = false;
 
   try {
     // Determine API URL: Use server-side internal URL if available, otherwise public URL, finally fallback to localhost
@@ -79,8 +80,6 @@ export default async function Home() {
       fetch(`${apiUrl}/api/dashboard/lights`, { headers, cache: 'no-store' }),
       fetch(`${apiUrl}/api/dashboard/weather`, { headers, cache: 'no-store' })
     ])
-
-    let shouldRedirect = false;
 
     if (lightsRes.status === 401 || lightsRes.status === 403 || weatherRes.status === 401 || weatherRes.status === 403) {
       shouldRedirect = true;
