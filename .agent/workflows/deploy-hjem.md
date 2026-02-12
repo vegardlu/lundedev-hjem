@@ -22,7 +22,12 @@ description: Deploy lundedev-hjem to production.
     git push origin main
     ```
 
-5. Deploy on server.
+5. Wait for build.
+    ```bash
+    gh run watch
+    ```
+
+6. Deploy on server.
     ```bash
     ssh lundedev "cd /home/vegard/homelab/lundedev-hjem && git pull && docker compose pull && docker compose up -d"
     ```
