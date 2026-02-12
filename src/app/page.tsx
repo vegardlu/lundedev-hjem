@@ -1,4 +1,5 @@
 import { auth, signIn, signOut } from "@/auth";
+import { redirect } from "next/navigation";
 import { LightCard } from "@/components/dashboard/LightCard";
 import { WeatherCard, WeatherDto } from "@/components/dashboard/WeatherCard";
 
@@ -110,7 +111,7 @@ export default async function Home() {
 
   if (shouldRedirect) {
     console.log("Session expired or unauthorized. Redirecting to login...");
-    await signIn("google", { redirectTo: "/" });
+    redirect("/api/auth/signin?callbackUrl=/");
   }
 
   return (
