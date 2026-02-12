@@ -80,6 +80,11 @@ export default async function Home() {
       fetch(`${apiUrl}/api/dashboard/weather`, { headers, cache: 'no-store' })
     ])
 
+    if (lightsRes.status === 401 || lightsRes.status === 403 || weatherRes.status === 401 || weatherRes.status === 403) {
+      console.log("Session expired or unauthorized. Redirecting to login...");
+      await signIn("google", { redirectTo: "/" });
+    }
+
     if (lightsRes.ok) {
       lights = await lightsRes.json();
     } else {
