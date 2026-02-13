@@ -123,7 +123,7 @@ export function ChatInterface({ token, userName }: ChatInterfaceProps) {
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            placeholder={`Styr hjemm vårt med en prat...`}
+                            placeholder={`Styr hjemmet vårt med en prat...`}
                             className="w-full bg-zinc-900/80 backdrop-blur-xl border border-zinc-700/50 focus:border-zinc-500 rounded-full py-4 pl-6 pr-14 text-lg text-zinc-100 placeholder:text-zinc-500 shadow-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all duration-300"
                         />
                         <button

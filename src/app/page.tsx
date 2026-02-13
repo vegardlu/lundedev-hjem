@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { LiveLightGrid } from "@/components/dashboard/LiveLightGrid";
 import { WeatherCard, WeatherDto } from "@/components/dashboard/WeatherCard";
 import { ChatInterface } from "@/components/chat/ChatInterface";
+import { SensorGroupCard, SensorProps } from "@/components/dashboard/SensorGroupCard";
+import { BlindCard } from "@/components/dashboard/BlindCard";
 
 interface Light {
   id: string;
@@ -12,6 +14,20 @@ interface Light {
   area?: string;
   floor?: string;
   supportedColorModes?: string[];
+}
+
+interface Sensor extends SensorProps {
+  area?: string;
+  floor?: string;
+}
+
+interface Blind {
+  id: string;
+  name: string;
+  state: string;
+  currentPosition?: number;
+  area?: string;
+  floor?: string;
 }
 
 export default async function Home() {
@@ -67,6 +83,8 @@ export default async function Home() {
 
   // Handle Authenticated State
   let lights: Light[] = [];
+  let sensors: Sensor[] = [];
+  let blinds: Blind[] = [];
   let weather: WeatherDto[] = [];
   let error = null;
   let shouldRedirect = false;
@@ -81,33 +99,32 @@ export default async function Home() {
       Authorization: `Bearer ${session.idToken}`
     }
 
-    const [lightsRes, weatherRes] = await Promise.all([
+    const [lightsRes, weatherRes, sensorsRes, blindsRes] = await Promise.all([
       fetch(`${apiUrl}/api/dashboard/lights`, { headers, cache: 'no-store' }),
-      fetch(`${apiUrl}/api/dashboard/weather`, { headers, cache: 'no-store' })
+      fetch(`${apiUrl}/api/dashboard/weather`, { headers, cache: 'no-store' }),
+      fetch(`${apiUrl}/api/dashboard/sensors`, { headers, cache: 'no-store' }),
+      fetch(`${apiUrl}/api/dashboard/blinds`, { headers, cache: 'no-store' })
     ])
 
-    if (lightsRes.status === 401 || lightsRes.status === 403 || weatherRes.status === 401 || weatherRes.status === 403) {
+    if (lightsRes.status === 401 || lightsRes.status === 403) {
       shouldRedirect = true;
     } else {
-      if (lightsRes.ok) {
-        lights = await lightsRes.json();
-      } else {
-        console.error(`Lights API Error: ${lightsRes.status} ${lightsRes.statusText}`);
-        error = "Failed to load lights.";
-      }
+      if (lightsRes.ok) lights = await lightsRes.json();
+      else console.error(`Lights API Error: ${lightsRes.status}`);
 
-      if (weatherRes.ok) {
-        weather = await weatherRes.json();
-      } else {
-        console.error(`Weather API Error: ${weatherRes.status} ${weatherRes.statusText}`);
-        // Don't fail the whole dashboard if only weather fails
-      }
+      if (weatherRes.ok) weather = await weatherRes.json();
+      else console.error(`Weather API Error: ${weatherRes.status}`);
 
-      if (!lightsRes.ok && !weatherRes.ok) {
+      if (sensorsRes.ok) sensors = await sensorsRes.json();
+      else console.error(`Sensors API Error: ${sensorsRes.status}`);
+
+      if (blindsRes.ok) blinds = await blindsRes.json();
+      else console.error(`Blinds API Error: ${blindsRes.status}`);
+
+      if (!lightsRes.ok && !weatherRes.ok && !sensorsRes.ok && !blindsRes.ok) {
         error = "Failed to load dashboard data."
       }
     }
-
   } catch (e) {
     console.error("Failed to fetch dashboard API", e);
     error = "System unavailable.";
@@ -117,6 +134,16 @@ export default async function Home() {
     console.log("Session expired or unauthorized. Redirecting to login...");
     redirect("/api/auth/signin?callbackUrl=/");
   }
+
+  // Group sensors by area
+  const sensorsByArea: Record<string, Sensor[]> = {};
+  sensors.forEach(sensor => {
+    const area = sensor.area || "Other";
+    if (!sensorsByArea[area]) {
+      sensorsByArea[area] = [];
+    }
+    sensorsByArea[area].push(sensor);
+  });
 
   return (
     <main className="min-h-screen bg-zinc-950 text-zinc-100 pb-20 selection:bg-blue-500/30">
@@ -179,7 +206,41 @@ export default async function Home() {
           </section>
         )}
 
-        {/* 3. Lights Grouped by Floor and Room - Now LIVE */}
+        {/* 3. Sensors Grouped by Room */}
+        {Object.keys(sensorsByArea).length > 0 && (
+          <section>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {Object.entries(sensorsByArea).map(([area, areaSensors]) => (
+                <div key={area} className="h-full">
+                  <SensorGroupCard areaName={area} sensors={areaSensors} />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* 4. Blinds */}
+        {blinds.length > 0 && (
+          <section>
+            <h2 className="text-xl font-semibold mb-4 text-zinc-300">Blinds</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {blinds.map((blind) => (
+                <div key={blind.id} className="h-full">
+                  <BlindCard
+                    id={blind.id}
+                    name={blind.name}
+                    state={blind.state}
+                    currentPosition={blind.currentPosition}
+                    // @ts-expect-error - session type extension
+                    token={session.idToken}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* 5. Lights Grouped by Floor and Room */}
         {/* @ts-expect-error - session type extension */}
         <LiveLightGrid initialLights={lights} token={session.idToken} />
       </div>
