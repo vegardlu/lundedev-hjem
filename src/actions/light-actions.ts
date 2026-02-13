@@ -53,3 +53,25 @@ export async function updateLightAction(id: string, token: string, body: any) {
         return { success: false, error: "Network error" };
     }
 }
+
+export async function getLightsAction(token: string) {
+    const apiUrl = process.env.INTERNAL_API_URL || "http://lundedev-core:8080";
+
+    try {
+        const res = await fetch(`${apiUrl}/api/dashboard/lights`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            cache: 'no-store'
+        });
+
+        if (!res.ok) {
+            return { success: false, error: res.statusText };
+        }
+        const data = await res.json();
+        return { success: true, data };
+    } catch (error) {
+        console.error("[Action] Error fetching lights:", error);
+        return { success: false, error: "Network error" };
+    }
+}

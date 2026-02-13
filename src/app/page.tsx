@@ -1,6 +1,6 @@
 import { auth, signIn, signOut } from "@/auth";
 import { redirect } from "next/navigation";
-import { LightCard } from "@/components/dashboard/LightCard";
+import { LiveLightGrid } from "@/components/dashboard/LiveLightGrid";
 import { WeatherCard, WeatherDto } from "@/components/dashboard/WeatherCard";
 import { ChatInterface } from "@/components/chat/ChatInterface";
 
@@ -11,6 +11,7 @@ interface Light {
   brightness?: number;
   area?: string;
   floor?: string;
+  supportedColorModes?: string[];
 }
 
 export default async function Home() {
@@ -117,17 +118,6 @@ export default async function Home() {
     redirect("/api/auth/signin?callbackUrl=/");
   }
 
-  // Group Lights by Floor and Area
-  const lightsByFloor = lights.reduce((acc, light) => {
-    const floor = light.floor || "Other";
-    if (!acc[floor]) acc[floor] = [];
-    acc[floor].push(light);
-    return acc;
-  }, {} as Record<string, Light[]>);
-
-  // Sort floors (Optional: could add custom order logic)
-  const sortedFloors = Object.keys(lightsByFloor).sort();
-
   return (
     <main className="min-h-screen bg-zinc-950 text-zinc-100 pb-20 selection:bg-blue-500/30">
       {/* Header */}
@@ -189,60 +179,9 @@ export default async function Home() {
           </section>
         )}
 
-        {/* 3. Lights Grouped by Floor and Room */}
-        <section className="space-y-10">
-          {lights.length > 0 ? (
-            sortedFloors.map((floor) => {
-              const floorLights = lightsByFloor[floor];
-              const lightsByArea = floorLights.reduce((acc, light) => {
-                const area = light.area || "Other";
-                if (!acc[area]) acc[area] = [];
-                acc[area].push(light);
-                return acc;
-              }, {} as Record<string, Light[]>);
-              const sortedAreas = Object.keys(lightsByArea).sort();
-
-              return (
-                <div key={floor} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <h2 className="text-2xl font-light text-zinc-100 mb-6 flex items-center gap-4">
-                    {floor}
-                    <div className="h-px flex-1 bg-gradient-to-r from-zinc-800 to-transparent" />
-                  </h2>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {sortedAreas.map((area) => (
-                      <div key={area} className="bg-zinc-900/20 rounded-2xl p-5 border border-zinc-800/30">
-                        <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-zinc-700" />
-                          {area}
-                        </h3>
-                        <div className="grid grid-cols-2 gap-3">
-                          {lightsByArea[area].map((light) => (
-                            <LightCard
-                              key={light.id}
-                              id={light.id}
-                              name={light.name}
-                              isOn={light.isOn}
-                              brightness={light.brightness}
-                              // @ts-expect-error - session type extension
-                              token={session.idToken}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })
-          ) : (
-            !error && (
-              <div className="text-center py-20 text-zinc-600">
-                <p>No lights found.</p>
-              </div>
-            )
-          )}
-        </section>
+        {/* 3. Lights Grouped by Floor and Room - Now LIVE */}
+        {/* @ts-expect-error - session type extension */}
+        <LiveLightGrid initialLights={lights} token={session.idToken} />
       </div>
     </main>
   );

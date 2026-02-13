@@ -9,6 +9,7 @@ interface LightControlModalProps {
     lightName: string;
     initialIsOn: boolean;
     initialBrightness?: number; // 0-255
+    supportedColorModes?: string[];
     onToggle: (id: string) => void;
     onUpdate: (id: string, brightness: number, color: { r: number, g: number, b: number } | null) => void;
 }
@@ -33,7 +34,7 @@ const PRESET_COLORS = [
 ];
 
 export function LightControlModal({
-    isOpen, onClose, lightId, lightName, initialIsOn, initialBrightness, onToggle, onUpdate
+    isOpen, onClose, lightId, lightName, initialIsOn, initialBrightness, supportedColorModes, onToggle, onUpdate
 }: LightControlModalProps) {
     const [brightness, setBrightness] = useState(initialBrightness || 255);
     const [color, setColor] = useState("#FFB74D"); // Default warm
@@ -67,6 +68,8 @@ export function LightControlModal({
             onUpdate(lightId, brightness, rgb);
         }
     };
+
+    const supportsColor = supportedColorModes?.some(mode => ['hs', 'xy', 'rgb', 'rgbw'].includes(mode));
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -120,27 +123,29 @@ export function LightControlModal({
                     </div>
 
                     {/* Color Picker */}
-                    <div>
-                        <label className="block text-sm font-medium text-zinc-400 mb-3">Color</label>
+                    {supportsColor && (
+                        <div>
+                            <label className="block text-sm font-medium text-zinc-400 mb-3">Color</label>
 
-                        {/* Custom Color Wheel */}
-                        <div className="flex justify-center mb-4">
-                            <HexColorPicker color={color} onChange={handleColorChange} />
-                        </div>
+                            {/* Custom Color Wheel */}
+                            <div className="flex justify-center mb-4">
+                                <HexColorPicker color={color} onChange={handleColorChange} />
+                            </div>
 
-                        {/* Presets */}
-                        <div className="flex justify-center gap-3 flex-wrap">
-                            {PRESET_COLORS.map(c => (
-                                <button
-                                    key={c}
-                                    onClick={() => handleColorChange(c)}
-                                    className="w-8 h-8 rounded-full border border-zinc-600 shadow-sm hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    style={{ backgroundColor: c }}
-                                    aria-label={`Select color ${c}`}
-                                />
-                            ))}
+                            {/* Presets */}
+                            <div className="flex justify-center gap-3 flex-wrap">
+                                {PRESET_COLORS.map(c => (
+                                    <button
+                                        key={c}
+                                        onClick={() => handleColorChange(c)}
+                                        className="w-8 h-8 rounded-full border border-zinc-600 shadow-sm hover:scale-110 transition-transform focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        style={{ backgroundColor: c }}
+                                        aria-label={`Select color ${c}`}
+                                    />
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                 </div>
 

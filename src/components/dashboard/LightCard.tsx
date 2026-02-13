@@ -13,9 +13,10 @@ interface LightCardProps {
     isOn: boolean;
     brightness?: number;
     token: string;
+    supportedColorModes?: string[];
 }
 
-export function LightCard({ id, name, isOn: initialIsOn, brightness: initialBrightness, token }: LightCardProps) {
+export function LightCard({ id, name, isOn: initialIsOn, brightness: initialBrightness, token, supportedColorModes }: LightCardProps) {
     const [isOn, setIsOn] = useState(initialIsOn);
     const [brightness, setBrightness] = useState(initialBrightness);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -101,6 +102,7 @@ export function LightCard({ id, name, isOn: initialIsOn, brightness: initialBrig
                 lightName={name}
                 initialIsOn={isOn}
                 initialBrightness={brightness}
+                supportedColorModes={supportedColorModes}
                 onToggle={() => handleToggle()}
                 onUpdate={handleUpdate}
             />
