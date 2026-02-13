@@ -7,7 +7,9 @@ import {
     BoltIcon, // For power
     BeakerIcon, // For humidity (fallback)
     EyeIcon, // For motion/occupancy
-    CubeIcon // Generic fallback
+    CubeIcon, // Generic fallback
+    ChevronDownIcon,
+    ChevronUpIcon
 } from '@heroicons/react/24/outline';
 
 export interface SensorProps {
@@ -54,10 +56,14 @@ export function SensorGroupCard({ areaName, sensors }: SensorGroupCardProps) {
         return state;
     };
 
+    const [expanded, setExpanded] = React.useState(false);
+    const displayedSensors = expanded ? sensors : sensors.slice(0, 4);
+    const hasMore = sensors.length > 4;
+
     return (
         <DashboardCard title={areaName} className="h-full bg-zinc-900/50 border-zinc-800">
             <div className="flex flex-col gap-2">
-                {sensors.map((sensor) => (
+                {displayedSensors.map((sensor) => (
                     <div key={sensor.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-zinc-800/50 transition-colors">
                         <div className="flex items-center gap-2 overflow-hidden">
                             {getIcon(sensor.deviceClass)}
@@ -77,6 +83,25 @@ export function SensorGroupCard({ areaName, sensors }: SensorGroupCardProps) {
                         </div>
                     </div>
                 ))}
+
+                {hasMore && (
+                    <button
+                        onClick={() => setExpanded(!expanded)}
+                        className="flex items-center justify-center gap-1 w-full py-1 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+                    >
+                        {expanded ? (
+                            <>
+                                Show less
+                                <ChevronUpIcon className="w-3 h-3" />
+                            </>
+                        ) : (
+                            <>
+                                Show {sensors.length - 4} more
+                                <ChevronDownIcon className="w-3 h-3" />
+                            </>
+                        )}
+                    </button>
+                )}
             </div>
         </DashboardCard>
     );
