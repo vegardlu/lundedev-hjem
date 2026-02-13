@@ -84,14 +84,6 @@ export function LiveLightGrid({ initialLights, token }: LiveLightGridProps) {
                 }, {} as Record<string, Light[]>);
                 const sortedAreas = Object.keys(lightsByArea).sort();
 
-                // Determine grid columns based on number of areas to use horizontal space
-                let gridClass = "grid-cols-1";
-                if (sortedAreas.length === 2) {
-                    gridClass = "grid-cols-1 md:grid-cols-2";
-                } else if (sortedAreas.length >= 3) {
-                    gridClass = "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
-                }
-
                 return (
                     <div key={floor} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <h2 className="text-2xl font-light text-zinc-100 mb-6 flex items-center gap-4">
@@ -99,28 +91,40 @@ export function LiveLightGrid({ initialLights, token }: LiveLightGridProps) {
                             <div className="h-px flex-1 bg-gradient-to-r from-zinc-800 to-transparent" />
                         </h2>
 
-                        <div className={`grid ${gridClass} gap-6`}>
-                            {sortedAreas.map((area) => (
-                                <div key={area} className="bg-zinc-900/20 rounded-2xl p-5 border border-zinc-800/30">
-                                    <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-zinc-700" />
-                                        {area}
-                                    </h3>
-                                    <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-3">
-                                        {lightsByArea[area].map((light) => (
-                                            <LightCard
-                                                key={light.id}
-                                                id={light.id}
-                                                name={light.name}
-                                                isOn={light.isOn}
-                                                brightness={light.brightness}
-                                                supportedColorModes={light.supportedColorModes}
-                                                token={token}
-                                            />
-                                        ))}
+                        <div className="flex flex-wrap gap-6">
+                            {sortedAreas.map((area) => {
+                                const areaLights = lightsByArea[area];
+                                const weight = Math.max(1, areaLights.length);
+                                // Heuristic: each light needs roughly 160px width minimum + padding
+                                // We give a base flex-basis to ensure wrapping happens reasonably
+                                const basis = Math.min(100, Math.max(25, weight * 15)) + '%';
+
+                                return (
+                                    <div
+                                        key={area}
+                                        className="bg-zinc-900/20 rounded-2xl p-5 border border-zinc-800/30 flex-grow min-w-[280px]"
+                                        style={{ flexBasis: basis, flexGrow: weight }}
+                                    >
+                                        <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-zinc-700" />
+                                            {area}
+                                        </h3>
+                                        <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-3">
+                                            {areaLights.map((light) => (
+                                                <LightCard
+                                                    key={light.id}
+                                                    id={light.id}
+                                                    name={light.name}
+                                                    isOn={light.isOn}
+                                                    brightness={light.brightness}
+                                                    supportedColorModes={light.supportedColorModes}
+                                                    token={token}
+                                                />
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                )
+                            })}
                         </div>
                     </div>
                 );
