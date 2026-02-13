@@ -60,10 +60,10 @@ export function BlindCard({ id, name, state, currentPosition, token }: BlindCard
             <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col">
-                        <span className="text-sm font-medium text-zinc-400">
-                            {state.toUpperCase()}
+                        <span className={`text-sm font-medium ${state.toLowerCase() === 'unknown' ? 'text-zinc-600 lowercase' : 'text-zinc-400 uppercase'}`}>
+                            {state}
                         </span>
-                        {currentPosition !== undefined && (
+                        {currentPosition != null && (
                             <span className="text-xs text-zinc-500">
                                 {currentPosition}% Open
                             </span>
@@ -102,7 +102,7 @@ export function BlindCard({ id, name, state, currentPosition, token }: BlindCard
                     </button>
                 </div>
 
-                {currentPosition !== undefined && (
+                {currentPosition != null && (
                     <div className="w-full bg-zinc-800 rounded-full h-1.5 mt-1 overflow-hidden">
                         <div
                             className="bg-blue-500 h-1.5 rounded-full transition-all duration-500"
