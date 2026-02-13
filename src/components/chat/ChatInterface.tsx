@@ -19,13 +19,7 @@ export function ChatInterface({ token, userName }: ChatInterfaceProps) {
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    // const scrollToBottom = () => {
-    //     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    // };
 
-    // useEffect(() => {
-    //     scrollToBottom();
-    // }, [messages]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
