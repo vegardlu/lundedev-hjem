@@ -82,7 +82,14 @@ export function LiveLightGrid({ initialLights, token }: LiveLightGridProps) {
                     acc[area].push(light);
                     return acc;
                 }, {} as Record<string, Light[]>);
-                const sortedAreas = Object.keys(lightsByArea).sort();
+                const sortedAreas = Object.keys(lightsByArea).sort((a, b) => {
+                    const countA = lightsByArea[a].length;
+                    const countB = lightsByArea[b].length;
+                    if (countA !== countB) {
+                        return countB - countA; // Descending count
+                    }
+                    return a.localeCompare(b); // Alphabetical tie-breaker
+                });
 
                 return (
                     <div key={floor} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
