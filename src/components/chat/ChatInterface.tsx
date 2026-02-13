@@ -19,13 +19,13 @@ export function ChatInterface({ token, userName }: ChatInterfaceProps) {
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    };
+    // const scrollToBottom = () => {
+    //     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    // };
 
-    useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
+    // useEffect(() => {
+    //     scrollToBottom();
+    // }, [messages]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -82,8 +82,8 @@ export function ChatInterface({ token, userName }: ChatInterfaceProps) {
                                 <div className={`flex gap-3 max-w-[80%] ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
 
                                     <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${msg.role === "user"
-                                            ? "bg-blue-600"
-                                            : "bg-gradient-to-tr from-blue-500 to-purple-600"
+                                        ? "bg-blue-600"
+                                        : "bg-gradient-to-tr from-blue-500 to-purple-600"
                                         }`}>
                                         {msg.role === "user" ? (
                                             <span className="text-xs font-bold text-white">
@@ -96,8 +96,8 @@ export function ChatInterface({ token, userName }: ChatInterfaceProps) {
 
                                     <div
                                         className={`rounded-2xl px-5 py-3 text-sm leading-relaxed ${msg.role === "user"
-                                                ? "bg-blue-600/20 text-blue-100 border border-blue-500/30"
-                                                : "bg-zinc-800/50 text-zinc-300 border border-zinc-700/50"
+                                            ? "bg-blue-600/20 text-blue-100 border border-blue-500/30"
+                                            : "bg-zinc-800/50 text-zinc-300 border border-zinc-700/50"
                                             }`}
                                     >
                                         <div className="whitespace-pre-wrap">{msg.text}</div>
