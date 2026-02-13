@@ -23,17 +23,12 @@ export function WeatherCard({ weather }: WeatherCardProps) {
     }
 
     return (
-        <DashboardCard title={weather.location} className="hover:scale-105 transition-transform cursor-default">
-            <div className="flex items-center justify-between">
+        <DashboardCard title={weather.location} className="hover:scale-105 transition-transform cursor-default p-4">
+            <div className="flex items-center justify-between gap-4">
                 <div className="flex flex-col">
-                    <div className="text-3xl font-bold text-gray-100">{weather.temperature.toFixed(1)}°C</div>
-                    <p className="text-sm text-gray-400 capitalize mt-1">
+                    <div className="text-2xl font-bold text-gray-100">{weather.temperature.toFixed(1)}°</div>
+                    <p className="text-xs text-gray-400 capitalize">
                         {weather.symbolCode.replace(/_/g, ' ')}
-                        {weather.precipitationAmount !== null && weather.precipitationAmount !== undefined && (
-                            <span className="block text-xs mt-1 text-blue-400">
-                                Precip: {weather.precipitationAmount} mm
-                            </span>
-                        )}
                     </p>
                 </div>
                 {getWeatherIcon(weather.symbolCode)}

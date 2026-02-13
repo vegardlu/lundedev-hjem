@@ -8,9 +8,9 @@ interface DashboardCardProps {
 
 export function DashboardCard({ title, children, className = '' }: DashboardCardProps) {
     return (
-        <div className={`bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-700/50 hover:border-gray-600 transition-colors duration-200 ${className}`}>
-            <h3 className="text-xl font-medium text-gray-200 mb-4">{title}</h3>
-            <div className="text-gray-300">
+        <div className={`bg-zinc-900/50 rounded-xl p-4 shadow-sm border border-zinc-800/50 hover:border-zinc-700 transition-colors duration-200 ${className}`}>
+            <h3 className="text-xs font-medium text-zinc-500 mb-2 uppercase tracking-wide">{title}</h3>
+            <div className="text-zinc-300">
                 {children}
             </div>
         </div>

@@ -2,12 +2,15 @@ import { auth, signIn, signOut } from "@/auth";
 import { redirect } from "next/navigation";
 import { LightCard } from "@/components/dashboard/LightCard";
 import { WeatherCard, WeatherDto } from "@/components/dashboard/WeatherCard";
+import { ChatInterface } from "@/components/chat/ChatInterface";
 
 interface Light {
   id: string;
   name: string;
   isOn: boolean;
   brightness?: number;
+  area?: string;
+  floor?: string;
 }
 
 export default async function Home() {
@@ -114,22 +117,33 @@ export default async function Home() {
     redirect("/api/auth/signin?callbackUrl=/");
   }
 
+  // Group Lights by Floor and Area
+  const lightsByFloor = lights.reduce((acc, light) => {
+    const floor = light.floor || "Other";
+    if (!acc[floor]) acc[floor] = [];
+    acc[floor].push(light);
+    return acc;
+  }, {} as Record<string, Light[]>);
+
+  // Sort floors (Optional: could add custom order logic)
+  const sortedFloors = Object.keys(lightsByFloor).sort();
+
   return (
-    <main className="min-h-screen bg-zinc-950 text-zinc-100 pb-20">
+    <main className="min-h-screen bg-zinc-950 text-zinc-100 pb-20 selection:bg-blue-500/30">
       {/* Header */}
-      <header className="sticky top-0 z-10 backdrop-blur-md bg-zinc-950/80 border-b border-zinc-800/50">
+      <header className="sticky top-0 z-10 backdrop-blur-md bg-zinc-950/80 border-b border-zinc-800/50 mb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center text-xs font-bold">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center text-xs font-bold shadow-lg shadow-purple-500/20">
               LD
             </div>
-            <h1 className="text-xl font-semibold bg-gradient-to-r from-zinc-100 to-zinc-400 text-transparent bg-clip-text">
-              Dashboard
+            <h1 className="text-lg font-medium bg-gradient-to-r from-zinc-100 to-zinc-400 text-transparent bg-clip-text">
+              Hjem
             </h1>
           </div>
 
           <div className="flex items-center gap-4">
-            <span className="hidden sm:block text-sm text-zinc-400">{session.user?.name}</span>
+            <span className="hidden sm:block text-sm text-zinc-400 font-medium">{session.user?.name}</span>
             <form
               action={async () => {
                 "use server";
@@ -138,7 +152,7 @@ export default async function Home() {
             >
               <button
                 type="submit"
-                className="text-sm px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white"
+                className="text-xs px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white"
               >
                 Sign out
               </button>
@@ -147,11 +161,16 @@ export default async function Home() {
         </div>
       </header>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+
+        {/* 1. Chat Interface (Google Search Style) */}
+        <section className="flex flex-col items-center justify-center pt-4 md:pt-10">
+          {/* @ts-expect-error - session type extension */}
+          <ChatInterface token={session.idToken} userName={session.user?.name} />
+        </section>
 
         {error && (
-          <div className="mb-8 p-4 rounded-xl bg-red-950/30 border border-red-900/50 text-red-200 flex items-center gap-3">
+          <div className="p-4 rounded-xl bg-red-950/20 border border-red-900/30 text-red-300 text-sm flex items-center gap-3 justify-center">
             <svg className="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
@@ -159,46 +178,71 @@ export default async function Home() {
           </div>
         )}
 
-        <section>
-          <h2 className="text-2xl font-light mb-6 text-zinc-200">Weather</h2>
-          {weather.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {/* 2. Weather Cards (Compact) */}
+        {weather.length > 0 && (
+          <section>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {weather.map((w) => (
                 <WeatherCard key={w.location} weather={w} />
               ))}
             </div>
-          ) : (
-            <div className="text-zinc-500 italic p-4 text-center border border-dashed border-zinc-800 rounded-xl">
-              Weather data unavailable.
-            </div>
-          )}
-        </section>
+          </section>
+        )}
 
-        <section>
-          <h2 className="text-2xl font-light mb-6 text-zinc-200">Lighting</h2>
+        {/* 3. Lights Grouped by Floor and Room */}
+        <section className="space-y-10">
           {lights.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {lights.map((light: Light) => (
-                <LightCard
-                  key={light.id}
-                  id={light.id}
-                  name={light.name}
-                  isOn={light.isOn}
-                  brightness={light.brightness}
-                  // @ts-expect-error - session type extension
-                  token={session.idToken}
-                />
-              ))}
-            </div>
+            sortedFloors.map((floor) => {
+              const floorLights = lightsByFloor[floor];
+              const lightsByArea = floorLights.reduce((acc, light) => {
+                const area = light.area || "Other";
+                if (!acc[area]) acc[area] = [];
+                acc[area].push(light);
+                return acc;
+              }, {} as Record<string, Light[]>);
+              const sortedAreas = Object.keys(lightsByArea).sort();
+
+              return (
+                <div key={floor} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <h2 className="text-2xl font-light text-zinc-100 mb-6 flex items-center gap-4">
+                    {floor}
+                    <div className="h-px flex-1 bg-gradient-to-r from-zinc-800 to-transparent" />
+                  </h2>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {sortedAreas.map((area) => (
+                      <div key={area} className="bg-zinc-900/20 rounded-2xl p-5 border border-zinc-800/30">
+                        <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-zinc-700" />
+                          {area}
+                        </h3>
+                        <div className="grid grid-cols-2 gap-3">
+                          {lightsByArea[area].map((light) => (
+                            <LightCard
+                              key={light.id}
+                              id={light.id}
+                              name={light.name}
+                              isOn={light.isOn}
+                              brightness={light.brightness}
+                              // @ts-expect-error - session type extension
+                              token={session.idToken}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })
           ) : (
             !error && (
-              <div className="text-zinc-500 italic p-8 text-center border border-dashed border-zinc-800 rounded-xl">
-                No lights found.
+              <div className="text-center py-20 text-zinc-600">
+                <p>No lights found.</p>
               </div>
             )
           )}
         </section>
-
       </div>
     </main>
   );

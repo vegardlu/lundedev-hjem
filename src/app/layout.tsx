@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ChatWidget } from "@/components/chat/ChatWidget";
 import { auth } from "@/auth";
 
 const geistSans = Geist({
@@ -32,8 +31,6 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
-        {/* @ts-expect-error - session type extension needs to be fixed globally, but works for now */}
-        <ChatWidget token={session?.idToken} userName={session?.user?.name} />
       </body>
     </html>
   );

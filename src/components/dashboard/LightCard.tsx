@@ -67,25 +67,27 @@ export function LightCard({ id, name, isOn: initialIsOn, brightness: initialBrig
 
     return (
         <>
-            <div onClick={() => setIsModalOpen(true)} className="cursor-pointer">
-                <DashboardCard title={name} className={`${isOn ? 'bg-amber-900/10 border-amber-500/50' : 'opacity-75'} transition-all duration-200 active:scale-95`}>
+            <div onClick={() => setIsModalOpen(true)} className="cursor-pointer h-full">
+                <DashboardCard title={name} className={`h-full ${isOn ? 'bg-amber-900/10 border-amber-500/30' : 'opacity-60 hover:opacity-100'}`}>
                     <div className="flex items-center justify-between">
                         <div className="flex flex-col">
-                            <span className={`text-sm ${isOn ? 'text-amber-500 font-semibold' : 'text-gray-400'}`}>
+                            <span className={`text-lg font-semibold ${isOn ? 'text-amber-100' : 'text-zinc-400'}`}>
                                 {isOn ? 'On' : 'Off'}
                             </span>
-                            {isOn && brightness && (
-                                <span className="text-xs text-gray-400 mt-1">Brightness: {Math.round((brightness / 255) * 100)}%</span>
+                            {isOn && (
+                                <div className="h-1 w-12 bg-zinc-800 rounded-full mt-2 overflow-hidden">
+                                    <div className="h-full bg-amber-500" style={{ width: `${Math.round(((brightness || 0) / 255) * 100)}%` }} />
+                                </div>
                             )}
                         </div>
                         <button
                             onClick={handleToggle}
-                            className={`p-3 rounded-full transition-colors ${isOn ? 'bg-amber-500/20 text-amber-400 shadow-lg shadow-amber-500/10' : 'bg-gray-700/50 text-gray-500'} hover:bg-opacity-80`}
+                            className={`p-2 rounded-full transition-colors ${isOn ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20' : 'bg-zinc-700 text-zinc-400'} hover:scale-110 active:scale-95`}
                         >
                             {isLoading ? (
-                                <div className="w-8 h-8 rounded-full border-2 border-current border-t-transparent animate-spin" />
+                                <div className="w-5 h-5 rounded-full border-2 border-current border-t-transparent animate-spin" />
                             ) : (
-                                isOn ? <LightBulbIcon className="w-8 h-8" /> : <LightBulbOutline className="w-8 h-8" />
+                                isOn ? <LightBulbIcon className="w-5 h-5" /> : <LightBulbOutline className="w-5 h-5" />
                             )}
                         </button>
                     </div>
