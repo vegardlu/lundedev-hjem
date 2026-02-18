@@ -92,7 +92,6 @@ export default async function Home() {
   try {
     // Determine API URL: Use server-side internal URL if available, otherwise public URL, finally fallback to localhost
     const apiUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://lundedev-core:8080";
-    console.log("Fetching dashboard data from:", apiUrl);
 
     const headers = {
       // @ts-expect-error - session type extension
@@ -131,7 +130,6 @@ export default async function Home() {
   }
 
   if (shouldRedirect) {
-    console.log("Session expired or unauthorized. Redirecting to login...");
     redirect("/api/auth/signin?callbackUrl=/");
   }
 

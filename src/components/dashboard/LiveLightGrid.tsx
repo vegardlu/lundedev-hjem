@@ -54,7 +54,7 @@ export function LiveLightGrid({ initialLights, token }: LiveLightGridProps) {
         };
     }, [token]);
 
-    // Group Lights by Floor and Area (Logic moved from page.tsx)
+    // Group Lights by Floor and Area
     const lightsByFloor = lights.reduce((acc, light) => {
         const floor = light.floor || "Other";
         if (!acc[floor]) acc[floor] = [];

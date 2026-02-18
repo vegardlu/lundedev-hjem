@@ -18,7 +18,6 @@ export async function getSensorsAction(token: string) {
         const data = await res.json();
         return { success: true, data };
     } catch (error) {
-        console.error("[Action] Error fetching sensors:", error);
         return { success: false, error: "Network error" };
     }
 }

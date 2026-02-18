@@ -19,7 +19,6 @@ export async function getBlindsAction(token: string) {
         const data = await res.json();
         return { success: true, data };
     } catch (error) {
-        console.error("[Action] Error fetching blinds:", error);
         return { success: false, error: "Network error" };
     }
 }
@@ -44,7 +43,6 @@ export async function setBlindPositionAction(id: string, token: string, position
         revalidatePath("/");
         return { success: true };
     } catch (error) {
-        console.error("[Action] Error setting blind position:", error);
         return { success: false, error: "Network error" };
     }
 }
@@ -67,7 +65,6 @@ export async function openBlindAction(id: string, token: string) {
         revalidatePath("/");
         return { success: true };
     } catch (error) {
-        console.error("[Action] Error opening blind:", error);
         return { success: false, error: "Network error" };
     }
 }
@@ -90,7 +87,6 @@ export async function closeBlindAction(id: string, token: string) {
         revalidatePath("/");
         return { success: true };
     } catch (error) {
-        console.error("[Action] Error closing blind:", error);
         return { success: false, error: "Network error" };
     }
 }
@@ -113,7 +109,6 @@ export async function stopBlindAction(id: string, token: string) {
         revalidatePath("/");
         return { success: true };
     } catch (error) {
-        console.error("[Action] Error stopping blind:", error);
         return { success: false, error: "Network error" };
     }
 }
