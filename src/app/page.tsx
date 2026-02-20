@@ -125,7 +125,32 @@ export default async function Home() {
   }
 
   if (shouldRedirect) {
-    await signIn("google");
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center p-8 bg-zinc-950 text-zinc-100">
+        <div className="max-w-md w-full p-8 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-2xl">
+          <h1 className="text-2xl font-bold mb-6 text-center bg-gradient-to-r from-red-400 to-orange-500 text-transparent bg-clip-text">
+            Session Expired
+          </h1>
+          <p className="mb-8 text-zinc-400 text-center">
+            Your connection to the local dashboard endpoint has expired. Please sign in again.
+          </p>
+          <form
+            action={async () => {
+              "use server";
+              await signOut();
+            }}
+            className="flex justify-center"
+          >
+            <button
+              type="submit"
+              className="px-6 py-3 rounded-xl bg-zinc-800 text-white font-semibold hover:bg-zinc-700 transition-all duration-200 shadow-lg"
+            >
+              Back to Login
+            </button>
+          </form>
+        </div>
+      </main>
+    );
   }
 
   const sensorsByArea: Record<string, Sensor[]> = {};
