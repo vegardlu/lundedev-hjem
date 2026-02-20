@@ -84,7 +84,6 @@ export default async function Home() {
   let sensors: Sensor[] = [];
   let blinds: Blind[] = [];
   let weather: WeatherDto[] = [];
-  let error = null;
   let shouldRedirect = false;
 
   try {
@@ -118,16 +117,15 @@ export default async function Home() {
       else console.error(`Blinds API Error: ${blindsRes.status}`);
 
       if (!lightsRes.ok && !weatherRes.ok && !sensorsRes.ok && !blindsRes.ok) {
-        error = "Failed to load dashboard data."
+        // Silently fail, rendering what we can. Rule: No error messages.
       }
     }
   } catch (e) {
     console.error("Failed to fetch dashboard API", e);
-    error = "System unavailable.";
   }
 
   if (shouldRedirect) {
-    redirect("/api/auth/signin?callbackUrl=/");
+    await signIn("google");
   }
 
   const sensorsByArea: Record<string, Sensor[]> = {};
@@ -179,14 +177,7 @@ export default async function Home() {
           <ChatInterface token={session.idToken} userName={session.user?.name} />
         </section>
 
-        {error && (
-          <div className="p-4 rounded-xl bg-red-950/20 border border-red-900/30 text-red-300 text-sm flex items-center gap-3 justify-center">
-            <svg className="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            {error}
-          </div>
-        )}
+        {/* Error message completely removed per user rules. */}
 
         {weather.length > 0 && (
           <section>
