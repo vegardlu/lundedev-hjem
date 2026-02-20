@@ -81,3 +81,4 @@ Refer to the root `compose.yaml` in the homelab repository for the full producti
 ---
 
 Made with ❤️ by internal developers at Lundeberg.cc
+ 
