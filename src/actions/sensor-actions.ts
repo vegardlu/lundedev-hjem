@@ -1,8 +1,9 @@
 
 "use server";
 
+const apiUrl = process.env.INTERNAL_API_URL || "http://lundedev-core:8080";
+
 export async function getSensorsAction(token: string) {
-    const apiUrl = process.env.INTERNAL_API_URL || "http://lundedev-core:8080";
 
     try {
         const res = await fetch(`${apiUrl}/api/dashboard/sensors`, {

@@ -4,10 +4,10 @@ import React from 'react';
 import { DashboardCard } from './DashboardCard';
 import {
     FireIcon,
-    BoltIcon, // For power
-    BeakerIcon, // For humidity (fallback)
-    EyeIcon, // For motion/occupancy
-    CubeIcon, // Generic fallback
+    BoltIcon,
+    BeakerIcon,
+    EyeIcon,
+    CubeIcon,
     ChevronDownIcon,
     ChevronUpIcon
 } from '@heroicons/react/24/outline';
@@ -49,7 +49,6 @@ export function SensorGroupCard({ areaName, sensors }: SensorGroupCardProps) {
         if (deviceClass === 'temperature' || deviceClass === 'humidity' || deviceClass === 'power') {
             const num = parseFloat(state);
             if (!isNaN(num)) {
-                // Round to 1 decimal place for neatness
                 return Math.round(num * 10) / 10;
             }
         }

@@ -24,7 +24,6 @@ export function LiveLightGrid({ initialLights, token }: LiveLightGridProps) {
     const [error, setError] = useState<string | null>(null);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-    // Function to fetch lights
     const fetchLights = async () => {
         try {
             const result = await getLightsAction(token);
@@ -40,12 +39,11 @@ export function LiveLightGrid({ initialLights, token }: LiveLightGridProps) {
         }
     };
 
-    // Set up polling
     useEffect(() => {
         // Initial sync ensures we are fresh if navigating back
         fetchLights();
 
-        intervalRef.current = setInterval(fetchLights, 3000); // Poll every 3 seconds
+        intervalRef.current = setInterval(fetchLights, 3000);
 
         return () => {
             if (intervalRef.current) {
@@ -54,7 +52,6 @@ export function LiveLightGrid({ initialLights, token }: LiveLightGridProps) {
         };
     }, [token]);
 
-    // Group Lights by Floor and Area
     const lightsByFloor = lights.reduce((acc, light) => {
         const floor = light.floor || "Other";
         if (!acc[floor]) acc[floor] = [];
@@ -86,9 +83,9 @@ export function LiveLightGrid({ initialLights, token }: LiveLightGridProps) {
                     const countA = lightsByArea[a].length;
                     const countB = lightsByArea[b].length;
                     if (countA !== countB) {
-                        return countB - countA; // Descending count
+                        return countB - countA;
                     }
-                    return a.localeCompare(b); // Alphabetical tie-breaker
+                    return a.localeCompare(b);
                 });
 
                 return (
@@ -102,8 +99,6 @@ export function LiveLightGrid({ initialLights, token }: LiveLightGridProps) {
                             {sortedAreas.map((area) => {
                                 const areaLights = lightsByArea[area];
                                 const weight = Math.max(1, areaLights.length);
-                                // Heuristic: each light needs roughly 160px width minimum + padding
-                                // We give a base flex-basis to ensure wrapping happens reasonably
                                 const basis = Math.min(100, Math.max(25, weight * 15)) + '%';
 
                                 return (

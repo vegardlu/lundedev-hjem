@@ -8,13 +8,12 @@ interface LightControlModalProps {
     lightId: string;
     lightName: string;
     initialIsOn: boolean;
-    initialBrightness?: number; // 0-255
+    initialBrightness?: number;
     supportedColorModes?: string[];
     onToggle: (id: string) => void;
     onUpdate: (id: string, brightness: number, color: { r: number, g: number, b: number } | null) => void;
 }
 
-// Simple hex to rgb helper
 const hexToRgb = (hex: string) => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? {
@@ -25,22 +24,21 @@ const hexToRgb = (hex: string) => {
 }
 
 const PRESET_COLORS = [
-    "#FFB74D", // Warm
-    "#E0F7FA", // Cool White
-    "#F44336", // Red
-    "#4CAF50", // Green
-    "#2196F3", // Blue
-    "#9C27B0", // Purple
+    "#FFB74D",
+    "#E0F7FA",
+    "#F44336",
+    "#4CAF50",
+    "#2196F3",
+    "#9C27B0",
 ];
 
 export function LightControlModal({
     isOpen, onClose, lightId, lightName, initialIsOn, initialBrightness, supportedColorModes, onToggle, onUpdate
 }: LightControlModalProps) {
     const [brightness, setBrightness] = useState(initialBrightness || 255);
-    const [color, setColor] = useState("#FFB74D"); // Default warm
+    const [color, setColor] = useState("#FFB74D");
     const [isOn, setIsOn] = useState(initialIsOn);
 
-    // Sync state if props change (e.g. initial load)
     useEffect(() => {
         setIsOn(initialIsOn);
         setBrightness(initialBrightness || 255);
@@ -57,7 +55,7 @@ export function LightControlModal({
     const handleBrightnessChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newVal = parseInt(e.target.value);
         setBrightness(newVal);
-        // Debounce this in real app, but for now simple update
+
         onUpdate(lightId, newVal, null);
     };
 

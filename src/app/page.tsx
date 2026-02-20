@@ -33,7 +33,6 @@ interface Blind {
 export default async function Home() {
   const session = await auth();
 
-  // Handle Login State
   if (!session) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center p-8 bg-zinc-950 text-zinc-100">
@@ -81,7 +80,6 @@ export default async function Home() {
     );
   }
 
-  // Handle Authenticated State
   let lights: Light[] = [];
   let sensors: Sensor[] = [];
   let blinds: Blind[] = [];
@@ -90,7 +88,6 @@ export default async function Home() {
   let shouldRedirect = false;
 
   try {
-    // Determine API URL: Use server-side internal URL if available, otherwise public URL, finally fallback to localhost
     const apiUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://lundedev-core:8080";
 
     const headers = {
@@ -133,7 +130,6 @@ export default async function Home() {
     redirect("/api/auth/signin?callbackUrl=/");
   }
 
-  // Group sensors by area
   const sensorsByArea: Record<string, Sensor[]> = {};
   sensors.forEach(sensor => {
     const area = sensor.area || "Other";
@@ -178,7 +174,6 @@ export default async function Home() {
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
 
-        {/* 1. Chat Interface (Google Search Style) */}
         <section className="flex flex-col items-center justify-center pt-4 md:pt-10">
           {/* @ts-expect-error - session type extension */}
           <ChatInterface token={session.idToken} userName={session.user?.name} />
@@ -193,7 +188,6 @@ export default async function Home() {
           </div>
         )}
 
-        {/* 2. Weather Cards (Compact) */}
         {weather.length > 0 && (
           <section>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -204,7 +198,6 @@ export default async function Home() {
           </section>
         )}
 
-        {/* 3. Sensors Grouped by Room */}
         {Object.keys(sensorsByArea).length > 0 && (
           <section>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -217,7 +210,6 @@ export default async function Home() {
           </section>
         )}
 
-        {/* 4. Blinds */}
         {blinds.length > 0 && (
           <section>
             <h2 className="text-xl font-semibold mb-4 text-zinc-300">Blinds</h2>
@@ -238,7 +230,6 @@ export default async function Home() {
           </section>
         )}
 
-        {/* 5. Lights Grouped by Floor and Room */}
         {/* @ts-expect-error - session type extension */}
         <LiveLightGrid initialLights={lights} token={session.idToken} />
       </div>

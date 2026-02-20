@@ -2,8 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 
+const apiUrl = process.env.INTERNAL_API_URL || "http://lundedev-core:8080";
+
 export async function getBlindsAction(token: string) {
-    const apiUrl = process.env.INTERNAL_API_URL || "http://lundedev-core:8080";
 
     try {
         const res = await fetch(`${apiUrl}/api/dashboard/blinds`, {
@@ -24,7 +25,6 @@ export async function getBlindsAction(token: string) {
 }
 
 export async function setBlindPositionAction(id: string, token: string, position: number) {
-    const apiUrl = process.env.INTERNAL_API_URL || "http://lundedev-core:8080";
 
     try {
         const res = await fetch(`${apiUrl}/api/dashboard/blinds/${id}/position`, {
@@ -48,7 +48,6 @@ export async function setBlindPositionAction(id: string, token: string, position
 }
 
 export async function openBlindAction(id: string, token: string) {
-    const apiUrl = process.env.INTERNAL_API_URL || "http://lundedev-core:8080";
 
     try {
         const res = await fetch(`${apiUrl}/api/dashboard/blinds/${id}/open`, {
@@ -70,7 +69,6 @@ export async function openBlindAction(id: string, token: string) {
 }
 
 export async function closeBlindAction(id: string, token: string) {
-    const apiUrl = process.env.INTERNAL_API_URL || "http://lundedev-core:8080";
 
     try {
         const res = await fetch(`${apiUrl}/api/dashboard/blinds/${id}/close`, {
@@ -92,7 +90,6 @@ export async function closeBlindAction(id: string, token: string) {
 }
 
 export async function stopBlindAction(id: string, token: string) {
-    const apiUrl = process.env.INTERNAL_API_URL || "http://lundedev-core:8080";
 
     try {
         const res = await fetch(`${apiUrl}/api/dashboard/blinds/${id}/stop`, {
