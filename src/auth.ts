@@ -14,7 +14,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     callbacks: {
         async signIn({ user }) {
-            return user.email === "vegard.hillestad@gmail.com";
+            if (!user.email) return false;
+            try {
+                const apiUrl = process.env.INTERNAL_API_URL || "http://lundedev-core:8080";
+                const res = await fetch(`${apiUrl}/api/public/auth/verify?email=${encodeURIComponent(user.email)}`, {
+                    cache: 'no-store'
+                });
+                if (res.ok) {
+                    return true;
+                }
+                console.warn(`User ${user.email} denied access because they are not in the database.`);
+                return false;
+            } catch (error) {
+                console.error("Auth verification failed:", error);
+                return false;
+            }
         },
         async jwt({ token, account }) {
             if (account) {
